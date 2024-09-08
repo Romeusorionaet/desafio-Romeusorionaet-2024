@@ -5,7 +5,7 @@ describe('Recintos do Zoologico', () => {
 
     beforeEach(() => {
         recintosZoo = new RecintosZoo();
-        
+    
         recintosZoo.recintos[0].animais = { especie: recintosZoo.animais[3], quantidade: 3 }; // 3 macacos
         recintosZoo.recintos[2].animais = { especie: recintosZoo.animais[4], quantidade: 1 }; // 1 gazela
         recintosZoo.recintos[4].animais = { especie: recintosZoo.animais[0], quantidade: 1 }; // 1 leão
