@@ -1,4 +1,5 @@
 import { calcEspacoDisponivelAposAdicao } from './helpers/calc-espaco-disponivel';
+import { compararBiomas } from './helpers/comparar-biomas'
 import { animais } from './data/animal';
 import { recintos } from './data/recinto';
 
@@ -11,16 +12,26 @@ class RecintosZoo {
     verificarEspacoDisponivel(animalSelecionado, quantidade) {
         return this.recintos.filter((recinto) => {
             const espacoDisponivel = calcEspacoDisponivelAposAdicao(recinto, animalSelecionado, quantidade);
-            
             const biomaApropriado = animalSelecionado.biomasApropriados.some(bioma => recinto.bioma.includes(bioma))
+
+            const hipopotamo = animalSelecionado.animal === 'HIPOPOTAMO'
+            const animalNoRecinto = recinto.animais.quantidade > 0
+
+            if(hipopotamo && animalNoRecinto){
+                const biomaAdequadoParaCompartilhamento = compararBiomas(recinto.bioma, animalSelecionado.biomasApropriados)
+
+                if(!biomaAdequadoParaCompartilhamento){
+                    return false
+                }
+            }
 
             if (!biomaApropriado) {
                 return false;
             }
 
-            const espacoSuficiente = espacoDisponivel < (animalSelecionado.tamanho * quantidade)
-            
-            if (espacoSuficiente) {
+            const espacoInsuficiente = espacoDisponivel < 0
+
+            if (espacoInsuficiente) {
                 return false;
             }
 
