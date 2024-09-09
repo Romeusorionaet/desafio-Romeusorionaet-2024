@@ -12,49 +12,46 @@ class RecintosZoo {
     verificarEspacoDisponivel(animalSelecionado, quantidade) {
         return this.recintos.filter((recinto) => {
             const espacoDisponivel = calcEspacoDisponivelAposAdicao(recinto, animalSelecionado, quantidade);
-            const biomaApropriado = animalSelecionado.biomasApropriados.some(bioma => recinto.bioma.includes(bioma))
 
-            const hipopotamo = animalSelecionado.animal === 'HIPOPOTAMO'
-            const animalNoRecinto = recinto.animais.quantidade > 0
-
-            if(hipopotamo && animalNoRecinto){
-                const biomaAdequadoParaCompartilhamento = compararBiomas(recinto.bioma, animalSelecionado.biomasApropriados)
-
-                if(!biomaAdequadoParaCompartilhamento){
-                    return false
-                }
-            }
-
-            if (!biomaApropriado) {
-                return false;
-            }
-
-            const espacoInsuficiente = espacoDisponivel < 0
-
-            if (espacoInsuficiente) {
-                return false;
-            }
-
-            const recintoVazio = recinto.animais.quantidade === 0
-            
-            if (recintoVazio) {
-                return true;
-            }
-
-            const conflitoDeEspecie = animalSelecionado.carnivoro && recinto.animais.especie.animal !== animalSelecionado.animal
-            
-            if (conflitoDeEspecie) {
-                return false;
-            }
-            
-            const carnivoroJaNoRecinto = recinto.animais.especie.carnivoro && !animalSelecionado.carnivoro;
-
-            if (carnivoroJaNoRecinto) {
-                return false;
-            }
-            
+            if (!this.biomaEhApropriado(recinto, animalSelecionado)) return false;
+            if (!this.espacoEhSuficiente(espacoDisponivel)) return false;
+            if (this.hipopotamoNoRecintoComAnimal(recinto, animalSelecionado)) return false;
+            if (this.conflitoDeEspecie(recinto, animalSelecionado)) return false;
+            if (this.carnivoroNoRecintoIncompativel(recinto, animalSelecionado)) return false;
+    
             return true;
         });
+    }
+    
+    biomaEhApropriado(recinto, animalSelecionado) {
+        return animalSelecionado.biomasApropriados.some(bioma => recinto.bioma.includes(bioma));
+    }
+    
+    espacoEhSuficiente(espacoDisponivel) {
+        return espacoDisponivel >= 0;
+    }
+    
+    hipopotamoNoRecintoComAnimal(recinto, animalSelecionado) {
+        const hipopotamo = animalSelecionado.animal === 'HIPOPOTAMO';
+        const animalNoRecinto = recinto.animais.quantidade > 0;
+
+        if (hipopotamo && animalNoRecinto) {
+            return !compararBiomas(recinto.bioma, animalSelecionado.biomasApropriados);
+        }
+
+        return false;
+    }
+    
+    conflitoDeEspecie(recinto, animalSelecionado) {
+        const recintoVazio = recinto.animais.quantidade === 0;
+        
+        if (recintoVazio) return false;
+        
+        return animalSelecionado.carnivoro && recinto.animais.especie.animal !== animalSelecionado.animal;
+    }
+    
+    carnivoroNoRecintoIncompativel(recinto, animalSelecionado) {
+        return recinto.animais.especie.carnivoro && !animalSelecionado.carnivoro;
     }
 
     analisaRecintos(animal, quantidade) {
